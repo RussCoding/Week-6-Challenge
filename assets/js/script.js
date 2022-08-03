@@ -5,7 +5,7 @@ let currentWeather = $("#today");
 let weeklyWeather = $("#5-day-forecast");
 let weeklyTitle = $("#5-day-title");
 
-var date = moment().format('dddd, MMMM Do YYYY');
+var date = moment();
 var cityHist = [];
 
 function init() {
@@ -67,15 +67,50 @@ function getData(e) {
 }
 
 function displayWeather(data, city) {
+    //assigns variable to html weather elements
     let title = currentWeather.children().eq(0).children("h2");
     let weatherImage = currentWeather.children().eq(0).children("img");
     let temp = currentWeather.children().eq(1);
     let wind = currentWeather.children().eq(2);
     let humidity = currentWeather.children().eq(3);
     let uV = currentWeather.children().eq(4);
-    currentWeather.addClass("card bg-secondary")
+    currentWeather.addClass("card bg-secondary mb-3");
+
+    title.text(`${city}: ${date.format('dddd, MMMM Do YYYY')}`);
+    weatherImage.attr("src", `https://openweathermap.org/img/w/${data.current.weather[0].icon}.png`);
+    temp.text(`Temperature: ${data.current.temp}°C`);
+    wind.text(`Wind Speed: ${Math.round((data.current.wind_speed * 3.6))} km/h`);
+    humidity.text(`Humidty: ${data.current.humidity}%`);
+    uV.text(`UV Index: ${data.current.uvi}`);
+
+    let uvIndex = data.current.uvi;
+    if(uvIndex < 4) {
+        uvIndex.css("background-color", "green");
+    }else if(uv < 7) {
+        uvIndex.css("background-color", "yellow");
+    }else {
+        uvIndex.css("background-color", "red");
+    }
 }
 
 
+function displayForecast(data) {
+    for(let i = 0; i<5; i++) {
+        let dates = weeklyWeather.children().eq(i).children().eq(0);
+        let weatherImage = weeklyWeather.children().eq(i).children("img");
+        let temp = weeklyWeather.children().eq(i).children().eq(2);
+        let wind = weeklyWeather.children().eq(i).children().eq(3);
+        let humidity = weeklyWeather.children().eq(i).children().eq(4);
+
+        weeklyWeather.children().eq(i).addClass("card bg-secondary mb-3 mx-1");
+
+        let index = i+1;
+        dates.text(date.add(index, 'days').format("MMM Do YY"));
+        weatherImage.attr("src", `https://openweathermap.org/img/w/${data.daily[index].weather[0].icon}.png`);
+        temp.text(`Temp: ${data.daily[index].temp.day}°C`);
+        wind.text(`Wind: ${Math.round(data.daily[index].wind_speed * 3.6)} kph`);
+        humidity.text(`Humidity: ${data.daily[index].humidity}%`);
+    }
+}
 
 
